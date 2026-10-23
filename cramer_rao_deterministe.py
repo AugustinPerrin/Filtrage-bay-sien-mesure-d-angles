@@ -25,7 +25,10 @@ class DeterministicDynamicsPCRB:
         F = np.asarray(F, dtype=float)
         if F.shape != self.J.shape:
             raise ValueError('Dimension de F incompatible avec J')
-        # COMPLETER
+
+        F_inv = np.linalg.inv(F)
+        self.J = F_inv.T @ self.J @ F_inv
+
         self.J = (self.J + self.J.T) / 2
         return self.bound
 
@@ -34,7 +37,11 @@ class DeterministicDynamicsPCRB:
 
         H est la jacobienne de h evaluee a l'etat nominal, ou une matrice.
         """
-        # COMPLETER
+        H = np.asarray(H, dtype=float)
+        R = np.asarray(R, dtype=float)
+
+        self.J = self.J + H.T @ np.linalg.inv(R) @ H
+
         self.J = (self.J + self.J.T) / 2
         return self.bound
 
