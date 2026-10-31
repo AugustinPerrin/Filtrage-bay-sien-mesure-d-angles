@@ -42,8 +42,7 @@ def h(x):
 def h_jac(x):
     s = x[0]
     xs, ys = SENSOR
-    # COMPLETER
-    Jdx = 0
+    Jdx = ys / ((s-xs)**2+ys**2)
     Jdvx = 0
     return np.array([[Jdx, Jdvx]])
 
@@ -93,10 +92,12 @@ def information_curve(n_steps, bound_Q, mc_samples, seed):
     bound_calc = GaussianDynamicsPCRB(P0)
     bounds = np.empty((n_steps+1,2,2))
     bounds[0] = P0
-    noise_std = np.sqrt(np.diag(bound_Q))
     for k in range(1,n_steps+1):
-        # COMPLETER
-        samples = samples
+        samples = samples @ F.T + rng.multivariate_normal(
+                                                        np.zeros(2),
+                                                        bound_Q,
+                                                        size=mc_samples
+                                                        )
         bounds[k] = bound_calc.step(
             F=F, Q=bound_Q, H_jacobian=h_jac, R=R, states_next=samples
         )

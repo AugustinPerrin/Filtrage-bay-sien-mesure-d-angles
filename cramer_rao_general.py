@@ -60,9 +60,8 @@ def expected_measurement_information(H_jacobian, R, states):
     R = _as_covariance(R, m)
     information = np.zeros((n, n))
     for x in states:
-        # COMPLETER
-        H = None
-        information += None
+        H = H_jacobian(x)
+        information += H.T @ np.linalg.solve(R, H)
     return _sym(information / len(states))
 
 
@@ -93,9 +92,7 @@ class GaussianDynamicsPCRB:
         """
         F = np.asarray(F, dtype=float)
         Q = np.asarray(Q, dtype=float)
-        n = self.J.shape[0]
-        # Completer
-        P_pred = None
+        P_pred = F @ np.linalg.inv(self.J) @ F.T + Q
         self.J = _sym(np.linalg.inv(P_pred))
         return P_pred
 
@@ -104,8 +101,7 @@ class GaussianDynamicsPCRB:
         J_measurement = np.asarray(J_measurement, dtype=float)
         if J_measurement.shape != self.J.shape:
             raise ValueError("Dimension de l'information de mesure incorrecte")
-        # COMPLETER
-        self.J = Self.J
+        self.J = self.J + J_measurement
         return self.bound
 
     def update(self, H_jacobian, R, states):
@@ -124,7 +120,6 @@ def bearing_jacobian_1d(x, sensor_xy=(0.0, -20.0)):
     """Angle atan2(-ys, s-xs), etat x=(s,v), cible sur l'axe y=0."""
     xs, ys = sensor_xy
     s = x[0]
-    # COMPLETER
-    Jdx = 0
-    Jdvx = 0
+    Jdx = ys / ((s-xs)**2+ys**2)
+    Jdvx = 0.0
     return np.array([[Jdx, Jdvx]])
